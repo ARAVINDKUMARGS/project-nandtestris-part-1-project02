@@ -1,0 +1,14 @@
+CHIP FullAdder {
+    IN a, b, c;
+    OUT sum, carry;
+
+    PARTS:
+    // First stage
+    HalfAdder(a = a, b = b, sum = s1, carry = c1);
+
+    // Second stage
+    HalfAdder(a = s1, b = c, sum = sum, carry = c2);
+
+    // Final carry
+    Or(a = c1, b = c2, out = carry);
+}
