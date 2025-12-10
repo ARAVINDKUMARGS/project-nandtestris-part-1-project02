@@ -1,0 +1,33 @@
+CHIP ALU {
+    IN x[16], y[16], zx, nx, zy, ny, f, no;
+    OUT out[16], zr, ng;
+
+    PARTS:
+    // Zero or keep x
+    Mux16(a = x, b = false, sel = zx, out = xZeroed);
+    // Negate x if needed
+    Not16(in = xZeroed, out = xNeg);
+    Mux16(a = xZeroed, b = xNeg, sel = nx, out = xFinal);
+
+    // Zero or keep y
+    Mux16(a = y, b = false, sel = zy, out = yZeroed);
+    // Negate y if needed
+    Not16(in = yZeroed, out = yNeg);
+    Mux16(a = yZeroed, b = yNeg, sel = ny, out = yFinal);
+
+    // ALU main ops
+    And16(a = xFinal, b = yFinal, out = andOut);
+    Add16(a = xFinal, b = yFinal, out = addOut);
+    Mux16(a = andOut, b = addOut, sel = f, out = aluOut);
+
+    // Optional negate output
+    Not16(in = aluOut, out = aluOutNeg);
+    Mux16(a = aluOut, b = aluOutNeg, sel = no, out = out);
+
+    // Flags
+    Or16Way(in = out, out = orVal);
+    Not(in = orVal, out = zr);
+
+    // Negative flag
+    And(a = out[15], b = true, out = ng);
+}
